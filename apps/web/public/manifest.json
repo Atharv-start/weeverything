@@ -1,0 +1,21 @@
+{
+  "name": "WeEverything Super App",
+  "short_name": "WeEverything",
+  "description": "Enterprise Super App Ecosystem Platform",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#dfff00",
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=192&auto=format&fit=crop",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=512&auto=format&fit=crop",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

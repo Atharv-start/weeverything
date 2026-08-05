@@ -1,0 +1,170 @@
+# =============================================================
+# WeEverything — Production .gitignore
+# Monorepo: pnpm + Turborepo + Next.js + Node.js
+# =============================================================
+
+# ─── Environment Variables & Secrets ─────────────────────────
+.env
+.env.local
+.env.*.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.staging
+.env.staging.local
+.env.production
+.env.production.local
+.env.override
+
+# ─── Dependencies ────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# ─── Build Outputs ───────────────────────────────────────────
+dist/
+dist-ssr/
+build/
+out/
+.output/
+.next/
+.nuxt/
+.svelte-kit/
+.vercel/
+.netlify/
+
+# ─── Turborepo ───────────────────────────────────────────────
+.turbo/
+
+# ─── Cache ───────────────────────────────────────────────────
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# ─── Test & Coverage ─────────────────────────────────────────
+coverage/
+.nyc_output/
+*.lcov
+junit.xml
+test-results/
+playwright-report/
+playwright/.cache/
+
+# ─── Logs ────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.pid
+*.seed
+*.pid.lock
+
+# ─── Database ────────────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-shm
+*.db-wal
+prisma/dev.db
+prisma/test.db
+
+# ─── Docker ──────────────────────────────────────────────────
+docker-compose.override.yml
+.docker/
+
+# ─── OS-Specific Files ───────────────────────────────────────
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ─── Editor & IDE ────────────────────────────────────────────
+# VS Code (keep settings.json for team, ignore local overrides)
+.vscode/settings.json
+.vscode/*.code-workspace
+.vscode/launch.json
+.vscode/tasks.json
+
+# JetBrains (WebStorm, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Vim / NeoVim
+*.swp
+*.swo
+*.swn
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+Session.vim
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+
+# ─── Temporary & Misc ────────────────────────────────────────
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+.sass-cache/
+
+# ─── Storybook ───────────────────────────────────────────────
+storybook-static/
+
+# ─── Generated Types & Prisma ────────────────────────────────
+# Prisma generated client is a build artifact — regenerate with `pnpm db:generate`
+packages/database/generated/
+
+# ─── Secrets & Certificates ──────────────────────────────────
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+secrets/
+.secrets/
+
+# ─── Package manager locks (keep pnpm-lock.yaml) ─────────────
+package-lock.json
+yarn.lock

@@ -1,0 +1,25 @@
+{
+  "name": "weeverything",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "db:migrate": "pnpm --filter @weeverything/database migrate:dev",
+    "db:migrate:prod": "pnpm --filter @weeverything/database migrate:deploy",
+    "db:seed": "pnpm --filter @weeverything/database seed",
+    "db:studio": "pnpm --filter @weeverything/database studio",
+    "db:generate": "pnpm --filter @weeverything/database generate",
+    "db:reset": "pnpm --filter @weeverything/database migrate:reset"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3",
+    "prettier": "^3.4.2",
+    "eslint": "^9.17.0"
+  }
+}

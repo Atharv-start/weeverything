@@ -1,0 +1,7 @@
+# WeEverything Super App Robots Policy
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://weeverything.app/sitemap.xml
