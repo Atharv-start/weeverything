@@ -28,7 +28,19 @@ const envSchema = z.object({
 
   // Third-party (optional)
   CLERK_SECRET_KEY: z.string().optional(),
+
+  // AI Platform — providers (all optional, at least one needed for AI features)
   GEMINI_API_KEY: z.string().optional(),
+  OPENAI_API_KEY: z.string().optional(),
+  ANTHROPIC_API_KEY: z.string().optional(),
+  OPENROUTER_API_KEY: z.string().optional(),
+  OLLAMA_BASE_URL: z.string().url().optional(),
+
+  // AI Platform — configuration
+  AI_DEFAULT_PROVIDER: z.enum(['gemini', 'openai', 'anthropic', 'openrouter', 'ollama']).default('gemini'),
+  AI_CACHE_TTL_SECONDS: z.coerce.number().default(300),
+  AI_MAX_TOKENS: z.coerce.number().default(2048),
+  AI_RATE_LIMIT_PER_MIN: z.coerce.number().default(60),
 });
 
 export type Env = z.infer<typeof envSchema>;

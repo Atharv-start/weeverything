@@ -10,6 +10,7 @@ import gsap from 'gsap';
 import { Button } from '@/components/ui/Button';
 import { DevInfoPanel } from '@/components/DevInfoPanel';
 import { LineSidebar } from '@/components/react-bits/LineSidebar';
+import { AICopilot } from '@/components/ai/AICopilot';
 
 import { useTheme } from '@/lib/theme';
 
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
   { href: '/channels', icon: 'play_circle', label: 'Channels' },
   { href: '/workspace', icon: 'dashboard', label: 'Workspace' },
   { href: '/wallet', icon: 'account_balance_wallet', label: 'Wallet' },
+  { href: '/ai', icon: 'smart_toy', label: 'AI Hub' },
   { href: '/mini-apps', icon: 'apps', label: 'Mini Apps' },
   { href: '/app-store', icon: 'storefront', label: 'App Store' },
   { href: '/search', icon: 'search', label: 'Search' },
@@ -115,6 +117,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Developer Observability Panel */}
       <DevInfoPanel />
+
+      {/* Global AI Copilot — accessible from every page */}
+      <AICopilot />
     </div>
   );
 }

@@ -738,3 +738,94 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
 }
+
+// ============================================================
+// AI PLATFORM
+// ============================================================
+
+model AiRequestLog {
+  id            String   @id @default(cuid())
+  userId        String?
+  provider      String   // gemini | openai | anthropic | ollama | openrouter
+  model         String
+  feature       String   // copilot | rag | search | content-gen | doc-ai | summarization | analytics | anomaly | nl-query | voice
+  promptTokens  Int      @default(0)
+  outputTokens  Int      @default(0)
+  latencyMs     Int      @default(0)
+  cached        Boolean  @default(false)
+  success       Boolean  @default(true)
+  errorCode     String?
+  estimatedCost Float    @default(0) // USD
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([provider, feature])
+  @@index([createdAt])
+  @@index([success])
+}
+
+model AiPromptTemplate {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g. "chat.suggestions.v2"
+  name        String
+  description String?
+  template    String   // Handlebars / mustache style {{variable}} template
+  version     Int      @default(1)
+  isActive    Boolean  @default(true)
+  feature     String   // which AI feature this belongs to
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+  @@index([feature])
+  @@index([isActive])
+}
+
+model AiVectorDocument {
+  id          String   @id @default(cuid())
+  userId      String?
+  sourceType  String   // message | post | note | document | task | expense | notification
+  sourceId    String?
+  chunkIndex  Int      @default(0)
+  content     String   // the actual text chunk
+  embedding   String   // JSON-serialized float array
+  metadata    String?  // JSON string: tags, timestamps, etc.
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, sourceType])
+  @@index([sourceType, sourceId])
+  @@index([createdAt])
+}
+
+model AiPersonalizationProfile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  frequentFeatures   String?  // JSON array of most-used features
+  preferredLanguage  String   @default("en")
+  searchHistory      String?  // JSON array (last 20 queries)
+  contentPreferences String?  // JSON object
+  dashboardLayout    String?  // JSON object
+  lastActivityAt     DateTime @default(now())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model AiAnomaly {
+  id          String    @id @default(cuid())
+  userId      String?
+  type        String    // SUSPICIOUS_LOGIN | WALLET_ANOMALY | SPAM | FRAUD | ABNORMAL_USAGE
+  severity    String    @default("LOW") // LOW | MEDIUM | HIGH | CRITICAL
+  description String
+  metadata    String?   // JSON string with supporting evidence
+  isResolved  Boolean   @default(false)
+  resolvedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([type, severity])
+  @@index([isResolved])
+  @@index([createdAt])
+}
