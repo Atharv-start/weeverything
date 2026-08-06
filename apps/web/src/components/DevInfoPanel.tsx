@@ -29,7 +29,7 @@ export function DevInfoPanel() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 font-mono text-xs">
+    <div className="fixed top-4 right-4 z-50 font-mono text-xs">
       {/* Floating Toggle Button */}
       {!isOpen && (
         <button
@@ -44,7 +44,7 @@ export function DevInfoPanel() {
 
       {/* Expanded Modal / Drawer */}
       {isOpen && (
-        <div className="w-80 glass-card rounded-2xl border border-[var(--color-primary-glow)] p-4 shadow-2xl space-y-3 bg-[var(--color-surface)]/95 backdrop-blur-xl animate-in fade-in slide-in-from-bottom-4">
+        <div className="w-80 glass-card rounded-2xl border border-[var(--color-primary-glow)] p-4 shadow-2xl space-y-3 bg-[var(--color-surface)]/95 backdrop-blur-xl animate-in fade-in slide-in-from-top-4">
           <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-2.5">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-base text-[var(--color-primary)]">developer_board</span>
