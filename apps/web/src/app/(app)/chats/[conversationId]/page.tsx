@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import clsx from 'clsx';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 const EMOJI_LIST = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🎉', '🔥', '🚀', '💯'];
 
@@ -106,12 +107,15 @@ export default function ConversationPage() {
       {/* Top Bar Header */}
       <header className="px-6 py-4 bg-[#0e0e0e] border-b border-[#222222] flex items-center justify-between z-10">
         <div className="flex items-center gap-4">
-          <Link
-            href="/chats"
-            className="w-9 h-9 rounded-lg bg-[#0F0F0F] border border-[#222222] flex items-center justify-center text-[#888888] hover:text-white hover:border-[#dfff00] transition-colors"
-          >
-            <span className="material-symbols-outlined text-lg">arrow_back</span>
-          </Link>
+          <Tooltip content="Back to all conversations">
+            <Link
+              href="/chats"
+              aria-label="Back to chats"
+              className="w-9 h-9 rounded-lg bg-[#0F0F0F] border border-[#222222] flex items-center justify-center text-[#888888] hover:text-white hover:border-[#dfff00] transition-colors"
+            >
+              <span className="material-symbols-outlined text-lg">arrow_back</span>
+            </Link>
+          </Tooltip>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#201f1f] border border-[#222222] text-[#dfff00] flex items-center justify-center font-mono font-bold text-sm">
               {(chatName ?? 'C')?.[0]?.toUpperCase()}
@@ -133,18 +137,24 @@ export default function ConversationPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowSearchBox(!showSearchBox)}
-            className="w-9 h-9 rounded-lg bg-[#0F0F0F] border border-[#222222] flex items-center justify-center text-[#888888] hover:text-white hover:border-[#dfff00] transition-colors"
-          >
-            <span className="material-symbols-outlined text-lg">search</span>
-          </button>
-          <button
-            onClick={() => setShowDetailsDrawer(!showDetailsDrawer)}
-            className="w-9 h-9 rounded-lg bg-[#0F0F0F] border border-[#222222] flex items-center justify-center text-[#888888] hover:text-white hover:border-[#dfff00] transition-colors"
-          >
-            <span className="material-symbols-outlined text-lg">info</span>
-          </button>
+          <Tooltip content="Search messages in chat">
+            <button
+              onClick={() => setShowSearchBox(!showSearchBox)}
+              aria-label="Search conversation"
+              className="w-9 h-9 rounded-lg bg-[#0F0F0F] border border-[#222222] flex items-center justify-center text-[#888888] hover:text-white hover:border-[#dfff00] transition-colors"
+            >
+              <span className="material-symbols-outlined text-lg">search</span>
+            </button>
+          </Tooltip>
+          <Tooltip content="Toggle chat info drawer">
+            <button
+              onClick={() => setShowDetailsDrawer(!showDetailsDrawer)}
+              aria-label="Chat details"
+              className="w-9 h-9 rounded-lg bg-[#0F0F0F] border border-[#222222] flex items-center justify-center text-[#888888] hover:text-white hover:border-[#dfff00] transition-colors"
+            >
+              <span className="material-symbols-outlined text-lg">info</span>
+            </button>
+          </Tooltip>
         </div>
       </header>
 
@@ -278,20 +288,27 @@ export default function ConversationPage() {
         )}
 
         <form onSubmit={handleSend} className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={triggerSimulatedAttachment}
-            className="w-10 h-10 rounded-lg bg-[#0F0F0F] border border-[#222222] flex items-center justify-center text-[#888888] hover:text-white hover:border-[#dfff00] transition-colors"
-          >
-            <span className="material-symbols-outlined text-lg">attach_file</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            className="w-10 h-10 rounded-lg bg-[#0F0F0F] border border-[#222222] flex items-center justify-center text-[#888888] hover:text-white hover:border-[#dfff00] transition-colors"
-          >
-            <span className="material-symbols-outlined text-lg">mood</span>
-          </button>
+          <Tooltip content="Attach image or document">
+            <button
+              type="button"
+              onClick={triggerSimulatedAttachment}
+              aria-label="Attach file"
+              className="w-10 h-10 rounded-lg bg-[#0F0F0F] border border-[#222222] flex items-center justify-center text-[#888888] hover:text-white hover:border-[#dfff00] transition-colors"
+            >
+              <span className="material-symbols-outlined text-lg">attach_file</span>
+            </button>
+          </Tooltip>
+
+          <Tooltip content="Add emoji reaction">
+            <button
+              type="button"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              aria-label="Emoji picker"
+              className="w-10 h-10 rounded-lg bg-[#0F0F0F] border border-[#222222] flex items-center justify-center text-[#888888] hover:text-white hover:border-[#dfff00] transition-colors"
+            >
+              <span className="material-symbols-outlined text-lg">mood</span>
+            </button>
+          </Tooltip>
 
           <input
             value={message}
@@ -300,14 +317,17 @@ export default function ConversationPage() {
             className="flex-1 bg-[#0F0F0F] border border-[#222222] rounded-lg px-4 py-2.5 text-xs font-mono text-white placeholder-[#888888] focus:border-[#dfff00] outline-none transition-colors"
           />
 
-          <button
-            type="submit"
-            disabled={sendMutation.isPending || (!message.trim() && !attachment)}
-            className="bg-[#dfff00] text-[#050505] px-5 py-2.5 rounded-lg font-mono text-xs uppercase font-bold tracking-wider hover:brightness-110 disabled:opacity-50 transition-all flex items-center gap-1.5 shadow-sm"
-          >
-            <span>SEND</span>
-            <span className="material-symbols-outlined text-base">send</span>
-          </button>
+          <Tooltip content="Send message">
+            <button
+              type="submit"
+              disabled={sendMutation.isPending || (!message.trim() && !attachment)}
+              aria-label="Send message"
+              className="bg-[#dfff00] text-[#050505] px-5 py-2.5 rounded-lg font-mono text-xs uppercase font-bold tracking-wider hover:brightness-110 disabled:opacity-50 transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+            >
+              <span>SEND</span>
+              <span className="material-symbols-outlined text-base">send</span>
+            </button>
+          </Tooltip>
         </form>
       </footer>
     </div>

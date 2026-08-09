@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { useAuthGuard } from '@/lib/useAuthGuard';
 import { AuthModal } from '@/components/ui/AuthModal';
+import { Tooltip } from '@/components/ui/Tooltip';
 import clsx from 'clsx';
 
 interface ChannelVideo {
@@ -254,40 +255,51 @@ export default function ChannelsPage() {
               {/* Interactions */}
               <div className="flex items-center justify-between pt-2 border-t border-[var(--color-border)] font-mono text-xs">
                 <div className="flex items-center gap-6">
-                  <button
-                    onClick={() => handleToggleLike(v.id)}
-                    className={clsx(
-                      'flex items-center gap-1.5 font-bold transition-all cursor-pointer',
-                      v.isLiked ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
-                    )}
-                  >
-                    <span className="material-symbols-outlined text-lg">{v.isLiked ? 'favorite' : 'favorite'}</span>
-                    <span>{v.likes.toLocaleString()}</span>
-                  </button>
+                  <Tooltip content={v.isLiked ? 'Unlike reel' : 'Like this reel'}>
+                    <button
+                      onClick={() => handleToggleLike(v.id)}
+                      aria-label="Like reel"
+                      className={clsx(
+                        'flex items-center gap-1.5 font-bold transition-all cursor-pointer',
+                        v.isLiked ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+                      )}
+                    >
+                      <span className="material-symbols-outlined text-lg">{v.isLiked ? 'favorite' : 'favorite'}</span>
+                      <span>{v.likes.toLocaleString()}</span>
+                    </button>
+                  </Tooltip>
 
-                  <button
-                    onClick={() => setActiveCommentVideoId(activeCommentVideoId === v.id ? null : v.id)}
-                    className="flex items-center gap-1.5 text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-all cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-lg">chat_bubble</span>
-                    <span>{v.comments}</span>
-                  </button>
+                  <Tooltip content="View or post comments">
+                    <button
+                      onClick={() => setActiveCommentVideoId(activeCommentVideoId === v.id ? null : v.id)}
+                      aria-label="Comments"
+                      className="flex items-center gap-1.5 text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-all cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-lg">chat_bubble</span>
+                      <span>{v.comments}</span>
+                    </button>
+                  </Tooltip>
 
-                  <span className="text-[var(--color-text-subtle)] flex items-center gap-1">
-                    <span className="material-symbols-outlined text-base">visibility</span>
-                    {v.views}
-                  </span>
+                  <Tooltip content="Total views">
+                    <span className="text-[var(--color-text-subtle)] flex items-center gap-1">
+                      <span className="material-symbols-outlined text-base">visibility</span>
+                      {v.views}
+                    </span>
+                  </Tooltip>
                 </div>
 
-                <button
-                  onClick={() => handleToggleSave(v.id)}
-                  className={clsx(
-                    'transition-all cursor-pointer',
-                    v.isSaved ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
-                  )}
-                >
-                  <span className="material-symbols-outlined text-lg">{v.isSaved ? 'bookmark' : 'bookmark_border'}</span>
-                </button>
+                <Tooltip content={v.isSaved ? 'Remove bookmark' : 'Bookmark reel'}>
+                  <button
+                    onClick={() => handleToggleSave(v.id)}
+                    aria-label="Bookmark reel"
+                    className={clsx(
+                      'transition-all cursor-pointer',
+                      v.isSaved ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+                    )}
+                  >
+                    <span className="material-symbols-outlined text-lg">{v.isSaved ? 'bookmark' : 'bookmark_border'}</span>
+                  </button>
+                </Tooltip>
               </div>
 
               {/* Comments Drawer */}

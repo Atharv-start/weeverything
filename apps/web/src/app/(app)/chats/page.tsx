@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { useAuthGuard } from '@/lib/useAuthGuard';
 import { AuthModal } from '@/components/ui/AuthModal';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface Conversation {
   id: string;
@@ -150,13 +151,15 @@ export default function ChatsPage() {
         </div>
 
         <div className="flex gap-2">
-          <Button
-            onClick={() => requireAuth(() => setShowNewChat(true), 'start a new conversation')}
-            variant="secondary"
-            icon="add"
-          >
-            New Chat
-          </Button>
+          <Tooltip content="Start a new direct conversation">
+            <Button
+              onClick={() => requireAuth(() => setShowNewChat(true), 'start a new conversation')}
+              variant="secondary"
+              icon="add"
+            >
+              New Chat
+            </Button>
+          </Tooltip>
           <Link href="/mini-apps/whatsapp">
             <Button variant="primary" icon="chat">
               WhatsApp Hub

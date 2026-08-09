@@ -25,8 +25,12 @@ export class DatabaseModule implements OnModuleInit, OnModuleDestroy {
   constructor(private readonly prisma: PrismaClient) {}
 
   async onModuleInit() {
-    await this.prisma.$connect();
-    this.logger.log('Database connection established');
+    try {
+      await this.prisma.$connect();
+      this.logger.log('Database connection established');
+    } catch (err: any) {
+      this.logger.warn(`Initial database connection error (retrying on request): ${err.message}`);
+    }
   }
 
   async onModuleDestroy() {

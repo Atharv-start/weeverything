@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 export interface NavItem {
   href: string;
@@ -48,17 +49,18 @@ export function LineSidebar({
         </Link>
 
         {/* Theme Cycle Button */}
-        <button
-          onClick={cycleTheme}
-          aria-label={`Current theme: ${themeLabel}. Click to cycle light and dark theme.`}
-          title={`Theme: ${themeLabel} — click to cycle`}
-          className="group flex flex-col items-center gap-0.5 p-2 rounded-xl border border-[var(--color-border)] glass-card text-[var(--color-primary)] hover:border-[var(--color-primary)] focus-ring-neon transition-all active:scale-95 cursor-pointer"
-        >
-          <span className="material-symbols-outlined text-base">{themeIcon}</span>
-          <span className="font-mono text-[8px] uppercase font-bold text-[var(--color-text-muted)] group-hover:text-[var(--color-primary)]">
-            {themeLabel}
-          </span>
-        </button>
+        <Tooltip content={`Current theme: ${themeLabel} — Click to switch theme`} position="right">
+          <button
+            onClick={cycleTheme}
+            aria-label={`Current theme: ${themeLabel}. Click to cycle light and dark theme.`}
+            className="group flex flex-col items-center gap-0.5 p-2 rounded-xl border border-[var(--color-border)] glass-card text-[var(--color-primary)] hover:border-[var(--color-primary)] focus-ring-neon transition-all active:scale-95 cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-base">{themeIcon}</span>
+            <span className="font-mono text-[8px] uppercase font-bold text-[var(--color-text-muted)] group-hover:text-[var(--color-primary)]">
+              {themeLabel}
+            </span>
+          </button>
+        </Tooltip>
       </div>
 
       {/* React Bits Line-Guided Navigation Menu */}

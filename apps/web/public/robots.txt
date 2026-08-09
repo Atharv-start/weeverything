@@ -23,4 +23,4 @@ Disallow: /workspace
 Disallow: /notifications
 Disallow: /api/
 
-Sitemap: https://weeverything.app/sitemap.xml
+Sitemap: https://weeverything.vercel.app/sitemap.xml

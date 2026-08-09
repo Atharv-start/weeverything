@@ -5,7 +5,7 @@
   "main": "./index.js",
   "types": "./index.d.ts",
   "scripts": {
-    "generate": "prisma generate",
+    "generate": "prisma generate --schema=prisma/schema.prisma",
     "migrate:dev": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
     "migrate:reset": "prisma migrate reset",
@@ -13,10 +13,10 @@
     "studio": "prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "^6.3.1"
+    "@prisma/client": "^6.3.1",
+    "prisma": "^6.3.1"
   },
   "devDependencies": {
-    "prisma": "^6.3.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "@types/node": "^22.10.7"

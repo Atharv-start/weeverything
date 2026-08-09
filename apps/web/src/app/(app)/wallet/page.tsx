@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/Input';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuthGuard } from '@/lib/useAuthGuard';
 import { AuthModal } from '@/components/ui/AuthModal';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 type Tab = 'overview' | 'send' | 'request' | 'upi';
 
@@ -150,9 +151,11 @@ export default function WalletPage() {
         </div>
 
         <div className="flex gap-2">
-          <Button href="/mini-apps/utilities" variant="secondary" icon="qr_code_scanner">
-            QR Scanner
-          </Button>
+          <Tooltip content="Open camera QR scanner for instant payment">
+            <Button href="/mini-apps/utilities" variant="secondary" icon="qr_code_scanner">
+              QR Scanner
+            </Button>
+          </Tooltip>
         </div>
       </div>
 
@@ -176,20 +179,24 @@ export default function WalletPage() {
         </div>
 
         <div className="flex gap-3 flex-wrap">
-          <Button
-            onClick={() => setTab('upi')}
-            variant="primary"
-            icon="send_to_mobile"
-          >
-            UPI Direct Pay
-          </Button>
-          <Button
-            onClick={() => setTab('send')}
-            variant="secondary"
-            icon="send"
-          >
-            Transfer Cash
-          </Button>
+          <Tooltip content="Load funds or pay via Razorpay / Cashfree UPI Intent">
+            <Button
+              onClick={() => setTab('upi')}
+              variant="primary"
+              icon="send_to_mobile"
+            >
+              UPI Direct Pay
+            </Button>
+          </Tooltip>
+          <Tooltip content="Send ledger balance to another user via username or VPA">
+            <Button
+              onClick={() => setTab('send')}
+              variant="secondary"
+              icon="send"
+            >
+              Transfer Cash
+            </Button>
+          </Tooltip>
         </div>
       </Card>
 

@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 export interface MiniAppHeaderProps {
   /** Top category/section tag, e.g. "WELLNESS & FITNESS ENGINE" */
@@ -38,15 +39,17 @@ export function MiniAppHeader({
         {(backHref || category) && (
           <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
             {backHref && (
-              <Link
-                href={backHref}
-                aria-label="Back to Mini Apps"
-                className="text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-1 font-mono text-xs cursor-pointer group"
-              >
-                <span className="material-symbols-outlined text-sm group-hover:-translate-x-0.5 transition-transform">
-                  arrow_back
-                </span>
-              </Link>
+              <Tooltip content="Return to Mini Apps Hub" position="right">
+                <Link
+                  href={backHref}
+                  aria-label="Back to Mini Apps"
+                  className="text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-1 font-mono text-xs cursor-pointer group"
+                >
+                  <span className="material-symbols-outlined text-sm group-hover:-translate-x-0.5 transition-transform">
+                    arrow_back
+                  </span>
+                </Link>
+              </Tooltip>
             )}
             {category && <Badge variant="neon">{category}</Badge>}
           </div>

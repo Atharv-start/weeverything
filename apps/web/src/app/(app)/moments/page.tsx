@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/Input';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuthGuard } from '@/lib/useAuthGuard';
 import { AuthModal } from '@/components/ui/AuthModal';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 type FeedTab = 'discover' | 'connections';
 type SubFilter = 'for-you' | 'trending' | 'latest';
@@ -341,31 +342,40 @@ export default function MomentsPage() {
               {/* Action buttons */}
               <div className="flex items-center justify-between pt-2 border-t border-[var(--color-border)]">
                 <div className="flex items-center gap-4">
-                  <button
-                    onClick={() => toggleLike(post)}
-                    className={clsx(
-                      'flex items-center gap-1.5 font-mono text-xs font-bold transition-all cursor-pointer',
-                      post.isLiked ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
-                    )}
-                  >
-                    <span className="material-symbols-outlined text-lg">{post.isLiked ? 'favorite' : 'favorite_border'}</span>
-                    <span>{post.likesCount}</span>
-                  </button>
+                  <Tooltip content={post.isLiked ? 'Unlike moment' : 'Like this moment'}>
+                    <button
+                      onClick={() => toggleLike(post)}
+                      aria-label="Like moment"
+                      className={clsx(
+                        'flex items-center gap-1.5 font-mono text-xs font-bold transition-all cursor-pointer',
+                        post.isLiked ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+                      )}
+                    >
+                      <span className="material-symbols-outlined text-lg">{post.isLiked ? 'favorite' : 'favorite_border'}</span>
+                      <span>{post.likesCount}</span>
+                    </button>
+                  </Tooltip>
 
-                  <button
-                    onClick={() => setActiveCommentPostId(activeCommentPostId === post.id ? null : post.id)}
-                    className="flex items-center gap-1.5 font-mono text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-all cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-lg">chat_bubble</span>
-                    <span>{post.commentsCount}</span>
-                  </button>
+                  <Tooltip content="View or post comments">
+                    <button
+                      onClick={() => setActiveCommentPostId(activeCommentPostId === post.id ? null : post.id)}
+                      aria-label="Comments"
+                      className="flex items-center gap-1.5 font-mono text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-all cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-lg">chat_bubble</span>
+                      <span>{post.commentsCount}</span>
+                    </button>
+                  </Tooltip>
 
-                  <button
-                    onClick={() => handleShare(post)}
-                    className="flex items-center gap-1.5 font-mono text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-all cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-lg">share</span>
-                  </button>
+                  <Tooltip content="Share moment link">
+                    <button
+                      onClick={() => handleShare(post)}
+                      aria-label="Share moment"
+                      className="flex items-center gap-1.5 font-mono text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-all cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-lg">share</span>
+                    </button>
+                  </Tooltip>
                 </div>
               </div>
 

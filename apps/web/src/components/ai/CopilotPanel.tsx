@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { streamCopilot, aiClient, type CopilotMessage } from '@/lib/ai-client';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface Message {
   id: string;
@@ -162,13 +163,16 @@ export function CopilotPanel({ onClose }: { onClose: () => void }) {
             disabled={isStreaming}
             className="flex-1 bg-transparent text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] outline-none disabled:opacity-50"
           />
-          <button
-            type="submit"
-            disabled={!input.trim() || isStreaming}
-            className="w-7 h-7 rounded-lg bg-[var(--color-primary)] text-white flex items-center justify-center disabled:opacity-40 transition-opacity hover:opacity-90 cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-sm">send</span>
-          </button>
+          <Tooltip content="Send message to AI Copilot">
+            <button
+              type="submit"
+              disabled={!input.trim() || isStreaming}
+              aria-label="Send message"
+              className="w-7 h-7 rounded-lg bg-[var(--color-primary)] text-white flex items-center justify-center disabled:opacity-40 transition-opacity hover:opacity-90 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-sm">send</span>
+            </button>
+          </Tooltip>
         </div>
         <p className="text-[10px] text-[var(--color-text-muted)] text-center mt-1.5">
           AI can make mistakes. Verify important information.
