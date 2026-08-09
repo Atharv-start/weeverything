@@ -39,7 +39,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const hasClerkKey = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const hasClerkKey = typeof clerkKey === 'string' && clerkKey.length > 10 && clerkKey.startsWith('pk_');
 
   const content = (
     <Providers>

@@ -21,7 +21,8 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const hasClerkKey = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const hasClerkKey = typeof clerkKey === 'string' && clerkKey.length > 10 && clerkKey.startsWith('pk_');
 
   const handleNativeRegister = async (e: React.FormEvent) => {
     e.preventDefault();

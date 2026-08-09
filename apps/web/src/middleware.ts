@@ -18,7 +18,8 @@ const isProtectedRoute = createRouteMatcher([
 export default function middleware(req: NextRequest, evt: any) {
   // If Clerk Publishable Key is not configured in Vercel environment variables,
   // allow request to pass through cleanly without throwing Edge 500 MIDDLEWARE_INVOCATION_FAILED error.
-  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  if (typeof clerkKey !== 'string' || !clerkKey.startsWith('pk_')) {
     return NextResponse.next();
   }
 
