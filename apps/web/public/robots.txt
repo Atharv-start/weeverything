@@ -1,7 +1,26 @@
-# WeEverything Super App Robots Policy
+# WeEverything Production Robots.txt
 User-agent: *
+
+# Allow Public Discovery Pages
 Allow: /
+Allow: /home
+Allow: /about
+Allow: /terms
+Allow: /privacy
+Allow: /community-guidelines
+Allow: /acceptable-use
+Allow: /app-store
+Allow: /mini-apps
+Allow: /moments
+Allow: /channels
+
+# Disallow Private User Data & Admin Endpoints
+Disallow: /chats
+Disallow: /wallet
 Disallow: /admin
+Disallow: /settings
+Disallow: /workspace
+Disallow: /notifications
 Disallow: /api/
 
 Sitemap: https://weeverything.app/sitemap.xml

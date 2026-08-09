@@ -29,6 +29,16 @@ const envSchema = z.object({
   // Third-party (optional)
   CLERK_SECRET_KEY: z.string().optional(),
 
+  // Payment Providers (UPI / Cards / Netbanking)
+  PAYMENT_PROVIDER: z.enum(['razorpay', 'cashfree', 'sandbox']).default('sandbox'),
+  PAYMENT_MODE: z.enum(['sandbox', 'live']).default('sandbox'),
+  RAZORPAY_KEY_ID: z.string().optional(),
+  RAZORPAY_KEY_SECRET: z.string().optional(),
+  RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
+  CASHFREE_APP_ID: z.string().optional(),
+  CASHFREE_SECRET_KEY: z.string().optional(),
+  CASHFREE_WEBHOOK_SECRET: z.string().optional(),
+
   // AI Platform — providers (all optional, at least one needed for AI features)
   GEMINI_API_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),

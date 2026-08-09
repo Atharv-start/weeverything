@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/auth.store';
-import { useEffect } from 'react';
 import { api, setAuthToken } from '@/lib/api';
 import { formatDistanceToNow } from 'date-fns';
 import clsx from 'clsx';
@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuthGuard } from '@/lib/useAuthGuard';
 import { AuthModal } from '@/components/ui/AuthModal';
 
@@ -19,7 +20,7 @@ type SubFilter = 'for-you' | 'trending' | 'latest';
 
 interface MomentPost {
   id: string;
-  author: { displayName: string; username: string };
+  author: { id?: string; displayName: string; username: string };
   content: string;
   createdAt: string;
   media?: { url: string; mimeType?: string }[];
@@ -38,6 +39,7 @@ export default function MomentsPage() {
 
   const { accessToken, user } = useAuthStore();
   const { requireAuth, authModalOpen, closeAuthModal, protectedActionName } = useAuthGuard();
+  const qc = useQueryClient();
 
   const [feedTab, setFeedTab] = useState<FeedTab>('discover');
   const [subFilter, setSubFilter] = useState<SubFilter>('for-you');
@@ -47,107 +49,105 @@ export default function MomentsPage() {
   const [locationTag, setLocationTag] = useState('');
   const [hashtagInput, setHashtagInput] = useState('');
 
-  const [localPosts, setLocalPosts] = useState<MomentPost[]>([]);
   const [activeCommentPostId, setActiveCommentPostId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState('');
 
   useEffect(() => {
     if (accessToken) setAuthToken(accessToken);
-    // Only load user-created posts from localStorage — no fake seeds
-    const saved = localStorage.getItem('we_moments_posts_v2');
-    if (saved) {
-      try { setLocalPosts(JSON.parse(saved)); } catch { setLocalPosts([]); }
-    } else {
-      setLocalPosts([]);
-    }
   }, [accessToken]);
 
-  const savePostsToStorage = (updated: MomentPost[]) => {
-    setLocalPosts(updated);
-    localStorage.setItem('we_moments_posts_v2', JSON.stringify(updated));
-  };
+  // Real Database Query for Moments Feed
+  const { data: postsData, isLoading: postsLoading } = useQuery<MomentPost[]>({
+    queryKey: ['moments', feedTab],
+    queryFn: async () => {
+      try {
+        const res = await api.get('/moments', { params: { type: feedTab } });
+        return (res.data.data || []) as MomentPost[];
+      } catch {
+        const saved = localStorage.getItem('we_moments_posts_v2');
+        return saved ? JSON.parse(saved) : [];
+      }
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (content: string) => {
+      const res = await api.post('/moments', { content });
+      return res.data.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['moments'] });
+      setNewPostContent('');
+      setMediaUrl('');
+      setLocationTag('');
+      setHashtagInput('');
+      setShowCompose(false);
+    },
+    onError: () => {
+      // Local fallback if unauthenticated or offline
+      const parsedHashtags = hashtagInput
+        ? hashtagInput.split(',').map((h: string) => (h.trim().startsWith('#') ? h.trim() : `#${h.trim()}`))
+        : [];
+      const newPost: MomentPost = {
+        id: `p-${Date.now()}`,
+        author: { displayName: user?.displayName || 'Explorer', username: user?.username || 'explorer' },
+        content: newPostContent.trim(),
+        createdAt: new Date().toISOString(),
+        media: mediaUrl.trim() ? [{ url: mediaUrl.trim(), mimeType: 'image/jpeg' }] : undefined,
+        likesCount: 0,
+        commentsCount: 0,
+        isLiked: false,
+        isBookmarked: false,
+        location: locationTag.trim() || undefined,
+        hashtags: parsedHashtags,
+        commentsList: [],
+      };
+      const existing = postsData || [];
+      const updated = [newPost, ...existing];
+      localStorage.setItem('we_moments_posts_v2', JSON.stringify(updated));
+      qc.setQueryData(['moments', feedTab], updated);
+      setNewPostContent('');
+      setShowCompose(false);
+    },
+  });
+
+  const likeMutation = useMutation({
+    mutationFn: async ({ postId, isLiked }: { postId: string; isLiked: boolean }) => {
+      if (isLiked) {
+        await api.delete(`/moments/${postId}/like`);
+      } else {
+        await api.post(`/moments/${postId}/like`);
+      }
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['moments'] }),
+  });
+
+  const commentMutation = useMutation({
+    mutationFn: async ({ postId, text }: { postId: string; text: string }) => {
+      const res = await api.post(`/moments/${postId}/comments`, { content: text });
+      return res.data.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['moments'] });
+      setCommentText('');
+    },
+  });
 
   const handleCreatePost = () => {
     if (!newPostContent.trim()) return;
-
-    const parsedHashtags = hashtagInput
-      ? hashtagInput.split(',').map((h) => (h.trim().startsWith('#') ? h.trim() : `#${h.trim()}`))
-      : [];
-
-    const newPost: MomentPost = {
-      id: `p-${Date.now()}`,
-      author: { displayName: user?.displayName || 'Explorer', username: user?.username || 'explorer' },
-      content: newPostContent.trim(),
-      createdAt: new Date().toISOString(),
-      media: mediaUrl.trim() ? [{ url: mediaUrl.trim(), mimeType: 'image/jpeg' }] : undefined,
-      likesCount: 0,
-      commentsCount: 0,
-      isLiked: false,
-      isBookmarked: false,
-      location: locationTag.trim() || undefined,
-      hashtags: parsedHashtags,
-      commentsList: [],
-    };
-
-    const updated = [newPost, ...localPosts];
-    savePostsToStorage(updated);
-
-    setNewPostContent('');
-    setMediaUrl('');
-    setLocationTag('');
-    setHashtagInput('');
-    setShowCompose(false);
+    createMutation.mutate(newPostContent.trim());
   };
 
-  const toggleLike = (postId: string) => {
+  const toggleLike = (post: MomentPost) => {
     requireAuth(() => {
-      const updated = localPosts.map((p) => {
-        if (p.id === postId) {
-          return {
-            ...p,
-            isLiked: !p.isLiked,
-            likesCount: p.isLiked ? p.likesCount - 1 : p.likesCount + 1,
-          };
-        }
-        return p;
-      });
-      savePostsToStorage(updated);
+      likeMutation.mutate({ postId: post.id, isLiked: Boolean(post.isLiked) });
     }, 'like moments');
-  };
-
-  const toggleBookmark = (postId: string) => {
-    requireAuth(() => {
-      const updated = localPosts.map((p) => {
-        if (p.id === postId) {
-          return { ...p, isBookmarked: !p.isBookmarked };
-        }
-        return p;
-      });
-      savePostsToStorage(updated);
-    }, 'bookmark posts');
   };
 
   const handleAddComment = (postId: string) => {
     if (!commentText.trim()) return;
     requireAuth(() => {
-      const newComment = {
-        id: `c-${Date.now()}`,
-        author: user?.displayName || 'Explorer',
-        text: commentText.trim(),
-        time: 'Just now',
-      };
-
-      savePostsToStorage(localPosts.map((p) => {
-        if (p.id === postId) {
-          return {
-            ...p,
-            commentsCount: p.commentsCount + 1,
-            commentsList: [...(p.commentsList || []), newComment],
-          };
-        }
-        return p;
-      }));
-      setCommentText('');
+      commentMutation.mutate({ postId, text: commentText.trim() });
     }, 'post comments');
   };
 
@@ -160,14 +160,7 @@ export default function MomentsPage() {
     }
   };
 
-  const getProcessedPosts = () => {
-    let result = [...localPosts];
-    if (subFilter === 'trending') result.sort((a, b) => b.likesCount - a.likesCount);
-    else if (subFilter === 'latest') result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    return result;
-  };
-
-  const processedPosts = getProcessedPosts();
+  const displayPosts: MomentPost[] = postsData || [];
 
   return (
     <div ref={containerRef} className="page-wrapper space-y-8">
@@ -194,7 +187,7 @@ export default function MomentsPage() {
       {/* Feed Tabs */}
       <div className="anime-stagger flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-[var(--color-border)]">
         <div className="flex rounded-xl p-1 glass-card border border-[var(--color-border)]">
-          {(['discover', 'connections'] as FeedTab[]).map(tab => (
+          {(['discover', 'connections'] as FeedTab[]).map((tab: FeedTab) => (
             <button
               key={tab}
               onClick={() => setFeedTab(tab)}
@@ -212,7 +205,7 @@ export default function MomentsPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          {(['for-you', 'trending', 'latest'] as SubFilter[]).map(f => (
+          {(['for-you', 'trending', 'latest'] as SubFilter[]).map((f: SubFilter) => (
             <button
               key={f}
               onClick={() => setSubFilter(f)}
@@ -270,7 +263,7 @@ export default function MomentsPage() {
               </span>
               <div className="flex gap-3">
                 <Button onClick={() => setShowCompose(false)} variant="ghost">Cancel</Button>
-                <Button onClick={handleCreatePost} disabled={!newPostContent.trim()} variant="primary">
+                <Button onClick={handleCreatePost} isLoading={createMutation.isPending} disabled={!newPostContent.trim()} variant="primary">
                   Post Moment
                 </Button>
               </div>
@@ -281,7 +274,12 @@ export default function MomentsPage() {
 
       {/* Feed List or Empty State */}
       <div className="space-y-6">
-        {processedPosts.length === 0 ? (
+        {postsLoading ? (
+          <div className="space-y-4">
+            <Skeleton variant="card" />
+            <Skeleton variant="card" />
+          </div>
+        ) : displayPosts.length === 0 ? (
           <div className="anime-stagger flex flex-col items-center justify-center py-24 text-center space-y-6">
             <div className="w-20 h-20 rounded-full bg-[var(--color-primary-dim)] border border-[rgba(223,255,0,0.2)] flex items-center justify-center">
               <span className="material-symbols-outlined text-4xl text-[var(--color-primary)]">auto_awesome</span>
@@ -301,17 +299,17 @@ export default function MomentsPage() {
             </Button>
           </div>
         ) : (
-          processedPosts.map((post) => (
+          displayPosts.map((post: MomentPost) => (
             <Card key={post.id} variant="glass" className="anime-stagger p-6 space-y-4">
               {/* Author */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-[var(--color-primary)] text-[var(--color-text-inverse)] font-mono font-bold flex items-center justify-center glow-neon">
-                    {post.author.displayName[0]}
+                    {(post.author?.displayName || 'E')[0]}
                   </div>
                   <div>
-                    <h4 className="font-display font-bold text-sm text-[var(--color-text)]">{post.author.displayName}</h4>
-                    <p className="font-mono text-[10px] text-[var(--color-text-muted)]">@{post.author.username} {post.location && `• ${post.location}`}</p>
+                    <h4 className="font-display font-bold text-sm text-[var(--color-text)]">{post.author?.displayName || 'Explorer'}</h4>
+                    <p className="font-mono text-[10px] text-[var(--color-text-muted)]">@{post.author?.username || 'explorer'} {post.location && `• ${post.location}`}</p>
                   </div>
                 </div>
                 <span className="font-mono text-[10px] text-[var(--color-text-subtle)]">
@@ -332,7 +330,7 @@ export default function MomentsPage() {
               {/* Hashtags */}
               {post.hashtags && post.hashtags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  {post.hashtags.map((tag, i) => (
+                  {post.hashtags.map((tag: string, i: number) => (
                     <span key={i} className="font-mono text-[10px] text-[var(--color-primary)] bg-[var(--color-primary-dim)] px-2 py-0.5 rounded-full border border-[rgba(223,255,0,0.2)]">
                       {tag}
                     </span>
@@ -344,7 +342,7 @@ export default function MomentsPage() {
               <div className="flex items-center justify-between pt-2 border-t border-[var(--color-border)]">
                 <div className="flex items-center gap-4">
                   <button
-                    onClick={() => toggleLike(post.id)}
+                    onClick={() => toggleLike(post)}
                     className={clsx(
                       'flex items-center gap-1.5 font-mono text-xs font-bold transition-all cursor-pointer',
                       post.isLiked ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
@@ -369,16 +367,6 @@ export default function MomentsPage() {
                     <span className="material-symbols-outlined text-lg">share</span>
                   </button>
                 </div>
-
-                <button
-                  onClick={() => toggleBookmark(post.id)}
-                  className={clsx(
-                    'font-mono text-xs transition-all cursor-pointer',
-                    post.isBookmarked ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
-                  )}
-                >
-                  <span className="material-symbols-outlined text-lg">{post.isBookmarked ? 'bookmark' : 'bookmark_border'}</span>
-                </button>
               </div>
 
               {/* Comments Drawer */}
@@ -391,14 +379,14 @@ export default function MomentsPage() {
                       onChange={(e) => setCommentText(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleAddComment(post.id)}
                     />
-                    <Button onClick={() => handleAddComment(post.id)} variant="primary" size="sm">
+                    <Button onClick={() => handleAddComment(post.id)} isLoading={commentMutation.isPending} variant="primary" size="sm">
                       Reply
                     </Button>
                   </div>
 
                   {post.commentsList && post.commentsList.length > 0 && (
                     <div className="space-y-2 pt-2">
-                      {post.commentsList.map((cm) => (
+                      {post.commentsList.map((cm: { id: string; author: string; text: string; time: string }) => (
                         <div key={cm.id} className="p-3 bg-[var(--color-surface-dim)] rounded-xl border border-[var(--color-border)] font-mono text-xs">
                           <div className="flex justify-between text-[var(--color-text-muted)] mb-1">
                             <span className="font-bold text-[var(--color-primary)]">{cm.author}</span>

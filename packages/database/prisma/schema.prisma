@@ -55,6 +55,7 @@ model User {
 
   // Wallet
   wallet Wallet?
+  paymentGatewayTransactions PaymentGatewayTransaction[]
 
   // QR
   qrReferences QrReference[]
@@ -407,10 +408,11 @@ model Wallet {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
   ledgerEntries       LedgerEntry[]
-  paymentRequestsFrom PaymentRequest[]  @relation("PaymentFrom")
-  paymentRequestsTo   PaymentRequest[]  @relation("PaymentTo")
+  paymentRequestsFrom PaymentRequest[]            @relation("PaymentFrom")
+  paymentRequestsTo   PaymentRequest[]            @relation("PaymentTo")
+  paymentGatewayTransactions PaymentGatewayTransaction[]
 }
 
 model LedgerTransaction {
@@ -464,6 +466,35 @@ model PaymentRequest {
   @@index([fromWalletId])
   @@index([toWalletId])
   @@index([status])
+}
+
+model PaymentGatewayTransaction {
+  id                String    @id @default(cuid())
+  userId            String
+  walletId          String
+  provider          String    // RAZORPAY | CASHFREE | SANDBOX
+  providerOrderId   String    @unique
+  providerPaymentId String?
+  providerSignature String?
+  amount            Int       // Minor units (paise)
+  currency          String    @default("INR")
+  status            String    @default("INITIATED") // INITIATED | PENDING | AUTHORIZED | SUCCESS | FAILED | CANCELLED | EXPIRED
+  idempotencyKey    String    @unique
+  paymentMethod     String?   // UPI | CARD | NETBANKING
+  upiVpa            String?
+  rawPayload        String?
+  failureReason     String?
+  processedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([walletId])
+  @@index([status])
+  @@index([providerOrderId])
 }
 
 // ============================================================

@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: weeverything-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-weev_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-SuperSecretProdDBPass2026}
+      POSTGRES_DB: ${POSTGRES_DB:-weeverything_prod}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-weev_admin} -d ${POSTGRES_DB:-weeverything_prod}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: weeverything-redis
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD:-SuperSecretRedisPass2026}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: weeverything-api
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgres://${POSTGRES_USER:-weev_admin}:${POSTGRES_PASSWORD:-SuperSecretProdDBPass2026}@postgres:5432/${POSTGRES_DB:-weeverything_prod}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-SuperSecretRedisPass2026}@redis:6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      COOKIE_SECRET: ${COOKIE_SECRET}
+      CORS_ORIGINS: https://${DOMAIN_NAME:-weeverything.app}
+      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-razorpay}
+      PAYMENT_MODE: ${PAYMENT_MODE:-live}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
+      RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: weeverything-web
+    restart: always
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: https://${DOMAIN_NAME:-weeverything.app}/api
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+    depends_on:
+      - api
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: weeverything-caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME:-weeverything.app}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api
+
+volumes:
+  postgres_data:
+  redis_data:
+  caddy_data:
+  caddy_config:

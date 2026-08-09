@@ -47,7 +47,7 @@ export default function WalletPage() {
         const res = await api.get('/wallet');
         return res.data.data as { walletId: string; balance: number; formattedBalance: string; currency: string; isActive: boolean };
       } catch {
-        return { walletId: 'w-default', balance: 2485000, formattedBalance: '₹24,850.00', currency: 'INR', isActive: true };
+        return { walletId: 'w-default', balance: 0, formattedBalance: '₹0.00', currency: 'INR', isActive: true };
       }
     },
   });
@@ -106,16 +106,28 @@ export default function WalletPage() {
   });
 
   const handleUpiPay = () => {
-    requireAuth(() => {
-      if (!upiVpa || !sendAmount) {
-        setError('Please enter a valid UPI VPA and amount');
+    requireAuth(async () => {
+      if (!sendAmount) {
+        setError('Please enter a valid amount');
         setTimeout(() => setError(''), 4000);
         return;
       }
-      const upiUri = `upi://pay?pa=${encodeURIComponent(upiVpa)}&pn=WeEverything&am=${sendAmount}&cu=INR`;
-      window.location.href = upiUri;
-      setSuccess(`Launched UPI deep link for ${upiVpa}!`);
-      setTimeout(() => setSuccess(''), 4000);
+      try {
+        const amountPaise = Math.round(parseFloat(sendAmount) * 100);
+        const res = await api.post('/wallet/payment/create-order', {
+          amount: amountPaise,
+          upiVpa: upiVpa.trim() || undefined,
+          description: sendDesc.trim() || undefined,
+        });
+
+        setSuccess('Payment order created! Redirecting to UPI intent checkout...');
+        setTimeout(() => {
+          window.location.href = `/wallet/upi-checkout?orderId=${res.data.data.providerOrderId}`;
+        }, 1000);
+      } catch (e: any) {
+        setError(e.response?.data?.message || 'Failed to create payment order');
+        setTimeout(() => setError(''), 4000);
+      }
     }, 'execute UPI payments');
   };
 
