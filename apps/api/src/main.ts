@@ -100,8 +100,8 @@ async function bootstrap() {
     logger.log('Swagger UI available at /api/docs');
   }
 
-  const port = parseInt(process.env.API_PORT ?? '4000', 10);
-  await app.listen(port);
+  const port = parseInt(process.env.PORT ?? process.env.API_PORT ?? '4000', 10);
+  await app.listen(port, '0.0.0.0');
 
   logger.log(`WeEverything API running on port ${port} [${process.env.NODE_ENV ?? 'development'}]`);
 }
