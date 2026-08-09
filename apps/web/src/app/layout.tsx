@@ -67,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="antialiased bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-300 font-body selection:bg-[var(--color-primary-dim)] selection:text-[var(--color-primary)]" suppressHydrationWarning>
         {hasClerkKey ? (
-          <ClerkProvider appearance={{ baseTheme: dark } as any}>
+          <ClerkProvider publishableKey={clerkKey} appearance={{ baseTheme: dark } as any}>
             {content}
           </ClerkProvider>
         ) : (

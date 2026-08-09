@@ -1,5 +1,8 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  outputFileTracingRoot: path.join(__dirname, '../../'),
   transpilePackages: ['@clerk/nextjs', '@clerk/themes'],
   typescript: {
     ignoreBuildErrors: true,
@@ -8,7 +11,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ['localhost'],
+    domains: ['localhost', 'img.clerk.com'],
   },
   async rewrites() {
     return [
@@ -21,3 +24,4 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+

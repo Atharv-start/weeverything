@@ -24,17 +24,14 @@ export function ClerkTokenSync() {
             setAuthToken(token);
             // Fetch local SQLite user details to sync store
             const res = await api.get('/auth/me');
-            if (active) {
+            if (active && res.data?.data?.user) {
               // Set the access token and user record in Zustand store
               setTokens(token, '', res.data.data.user);
             }
           }
         } catch (err) {
           console.error('Failed to sync Clerk token', err);
-          if (active) clearAuth();
         }
-      } else {
-        clearAuth();
       }
     }
 

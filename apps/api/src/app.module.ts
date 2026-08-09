@@ -27,7 +27,7 @@ import { CorrelationIdMiddleware } from './common/middleware/correlation-id.midd
     ConfigModule.forRoot({
       isGlobal: true,
       validate: validateEnv,
-      envFilePath: ['../../.env', '.env'],
+      envFilePath: ['.env.local', '../../.env.local', '../../.env', '.env'],
     }),
     ThrottlerModule.forRoot([
       {

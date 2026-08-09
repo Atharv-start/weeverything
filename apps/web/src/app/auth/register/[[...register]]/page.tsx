@@ -89,8 +89,10 @@ export default function RegisterPage() {
         {hasClerkKey ? (
           <div className="flex justify-center">
             <SignUp
+              routing="path"
               path="/auth/register"
               signInUrl="/auth/login"
+              fallbackRedirectUrl="/home"
               forceRedirectUrl="/home"
               appearance={{
                 elements: {
