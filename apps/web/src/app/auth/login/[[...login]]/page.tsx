@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { SignIn } from '@clerk/nextjs';
+import React, { useState, useEffect } from 'react';
+import { SignIn, useAuth } from '@clerk/nextjs';
+import { dark } from '@clerk/themes';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import { Card } from '@/components/ui/Card';
@@ -11,6 +12,7 @@ import { Badge } from '@/components/ui/Badge';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { isSignedIn, isLoaded } = useAuth();
   const setTokens = useAuthStore((s) => s.setTokens);
   const login = useAuthStore((s) => s.login);
   const isLoading = useAuthStore((s) => s.isLoading);
@@ -21,6 +23,13 @@ export default function LoginPage() {
 
   const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   const hasClerkKey = typeof clerkKey === 'string' && clerkKey.length > 10 && clerkKey.startsWith('pk_');
+
+  // Auto-redirect to home if user is already signed in via Clerk
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.replace('/home');
+    }
+  }, [isLoaded, isSignedIn, router]);
 
   const handleNativeLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,29 +92,43 @@ export default function LoginPage() {
           </span>
         </div>
 
-        {/* Clerk Auth Component if Clerk publishable key is present */}
+        {/* Clerk Auth Component styled to match dark neon app theme */}
         {hasClerkKey ? (
-          <div className="flex justify-center">
+          <div className="flex justify-center w-full">
             <SignIn
               routing="path"
               path="/auth/login"
               signUpUrl="/auth/register"
               fallbackRedirectUrl="/home"
               forceRedirectUrl="/home"
-              appearance={{
-                elements: {
-                  formButtonPrimary: 'btn-neon w-full',
-                  card: 'bg-transparent shadow-none border-none p-0',
-                  headerTitle: 'hidden',
-                  headerSubtitle: 'hidden',
-                  socialButtonsBlockButton: 'btn-glass text-[var(--color-text)]',
-                  dividerText: 'text-[var(--color-text-muted)] font-mono text-xs',
-                  formFieldLabel: 'text-[var(--color-text-muted)] text-xs font-bold uppercase tracking-wider font-mono',
-                  formFieldInput: 'input-neon',
-                  footerActionText: 'text-[var(--color-text-muted)] font-mono text-xs',
-                  footerActionLink: 'text-[var(--color-primary)] font-mono font-bold hover:underline',
-                },
-              }}
+              appearance={
+                {
+                  baseTheme: dark,
+                  variables: {
+                    colorBackground: '#0d1117',
+                    colorPrimary: '#dfff00',
+                    borderRadius: '0.75rem',
+                  },
+                  elements: {
+                    rootBox: 'w-full flex justify-center',
+                    cardBox: 'w-full bg-[#0d1117]/90 border border-[rgba(223,255,0,0.2)] rounded-2xl shadow-xl p-2',
+                    card: 'bg-transparent shadow-none border-none p-4',
+                    headerTitle: 'font-display text-xl font-bold text-white text-center',
+                    headerSubtitle: 'text-xs font-mono text-gray-400 text-center',
+                    formButtonPrimary: 'btn-neon w-full py-2.5 text-black font-bold font-mono rounded-xl',
+                    socialButtonsBlockButton: 'bg-[#161b22] border border-gray-800 hover:bg-gray-800 text-white rounded-xl font-mono text-xs py-2.5 transition-all',
+                    socialButtonsBlockButtonText: 'text-white font-mono text-xs font-medium',
+                    dividerText: 'text-gray-400 font-mono text-xs',
+                    dividerLine: 'bg-gray-800',
+                    formFieldLabel: 'text-gray-300 text-xs font-bold uppercase tracking-wider font-mono mb-1',
+                    formFieldInput: 'bg-[#161b22] border border-gray-700 text-white text-sm rounded-xl px-3.5 py-2.5 focus:border-[#dfff00] transition-colors',
+                    footerActionText: 'text-gray-400 font-mono text-xs',
+                    footerActionLink: 'text-[#dfff00] font-mono font-bold hover:underline',
+                    identityPreviewText: 'text-white font-mono text-xs',
+                    identityPreviewEditButton: 'text-[#dfff00]',
+                  },
+                } as any
+              }
             />
           </div>
         ) : (

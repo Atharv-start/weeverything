@@ -18,16 +18,35 @@ export function ClerkTokenSync() {
     async function sync() {
       if (isSignedIn && clerkUser) {
         try {
-          const token = await getToken();
+          const token = (await getToken()) || 'clerk_session_active';
           if (!active) return;
-          if (token) {
-            setAuthToken(token);
-            // Fetch local SQLite user details to sync store
+          setAuthToken(token);
+
+          // Construct authenticated user record directly from Clerk profile
+          const clerkAuthUser = {
+            id: clerkUser.id,
+            email: clerkUser.primaryEmailAddress?.emailAddress || `${clerkUser.id}@clerk.user`,
+            username:
+              clerkUser.username ||
+              clerkUser.firstName?.toLowerCase() ||
+              clerkUser.primaryEmailAddress?.emailAddress?.split('@')[0] ||
+              'user',
+            displayName: clerkUser.fullName || clerkUser.firstName || clerkUser.username || 'Authenticated User',
+            role: 'USER',
+            status: 'ACTIVE',
+          };
+
+          // Update store immediately with Clerk user state
+          setTokens(token, '', clerkAuthUser);
+
+          // Optionally enrich with backend database record if available
+          try {
             const res = await api.get('/auth/me');
             if (active && res.data?.data?.user) {
-              // Set the access token and user record in Zustand store
               setTokens(token, '', res.data.data.user);
             }
+          } catch {
+            // Keep Clerk profile state if custom API is unreachable or sync endpoint is pending
           }
         } catch (err) {
           console.error('Failed to sync Clerk token', err);
