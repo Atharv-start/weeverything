@@ -269,3 +269,132 @@
     border: 1px solid rgba(223, 255, 0, 0.25);
   }
 }
+
+/* ============================================================
+   PRINT STYLESHEET
+   ============================================================ */
+@media print {
+  /* Force light background for print */
+  :root,
+  .dark,
+  .light {
+    --color-bg: #ffffff;
+    --color-surface: #ffffff;
+    --color-text: #000000;
+    --color-text-muted: #555555;
+    --color-border: #cccccc;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Hide all chrome UI */
+  /* Sidebar & Nav */
+  nav,
+  aside,
+  [class*="LineSidebar"],
+  header.glass-header,
+  .lg\:hidden[class*="header"],
+  /* Mobile bottom nav */
+  nav.lg\:hidden,
+  /* Floating buttons */
+  #ai-copilot-trigger,
+  #scroll-to-top-btn,
+  [id^="dev-panel"],
+  /* AI Copilot panel */
+  [class*="DraggablePanel"],
+  [class*="CopilotPanel"],
+  /* Dev panel */
+  [class*="DevInfoPanel"],
+  /* Cookie consent */
+  [role="dialog"][aria-label="Cookie consent"],
+  /* Scroll progress bar */
+  [role="progressbar"],
+  /* Offline banner */
+  [class*="OfflineBanner"],
+  /* Print button */
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Remove fixed/sticky positioning */
+  .fixed,
+  .sticky {
+    position: static !important;
+  }
+
+  /* Full width main content (no sidebar margin) */
+  main {
+    margin-left: 0 !important;
+    padding: 24pt !important;
+    max-width: 100% !important;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    color: #000000 !important;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  p, li {
+    color: #111111 !important;
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Preserve links with URL hint */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 10pt;
+    color: #555555;
+  }
+  a[href^="/"]:not([href="#"])::after {
+    content: "";
+  }
+
+  /* Cards — keep on same page where possible */
+  .glass-card,
+  [class*="card"],
+  article,
+  section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    border: 1px solid #cccccc !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  /* Glassmorphism overrides */
+  .glass-modal,
+  .glass-header,
+  .glass-card-strong {
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid #cccccc !important;
+    box-shadow: none !important;
+  }
+
+  /* Reset neon colors for print */
+  .text-neon,
+  [class*="text-[var(--color-primary)]"] {
+    color: #000000 !important;
+  }
+
+  .badge-neon {
+    background: #eeeeee !important;
+    color: #000000 !important;
+    border: 1px solid #cccccc !important;
+  }
+
+  /* Page size */
+  @page {
+    size: A4;
+    margin: 20mm;
+  }
+}
+

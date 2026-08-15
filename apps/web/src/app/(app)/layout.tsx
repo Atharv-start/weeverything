@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/Button';
 import { DevInfoPanel } from '@/components/DevInfoPanel';
 import { LineSidebar } from '@/components/react-bits/LineSidebar';
 import { AICopilot } from '@/components/ai/AICopilot';
+import { ScrollToTop } from '@/components/ScrollToTop';
+import { ScrollProgressBar } from '@/components/ScrollProgressBar';
 
 import { useTheme } from '@/lib/theme';
 
@@ -72,6 +74,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-300">
+
+      {/* ── SCROLL PROGRESS BAR ───────────────────────────────── */}
+      <ScrollProgressBar />
+
+      {/* ── SKIP TO CONTENT ───────────────────────────────────── */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[10000] focus:px-4 focus:py-2 focus:rounded-xl focus:bg-[var(--color-primary)] focus:text-[var(--color-text-inverse)] focus:font-mono focus:text-xs focus:font-bold focus:shadow-lg focus:outline-none"
+      >
+        Skip to main content
+      </a>
 
       {/* ── MOBILE TOP HEADER BAR (lg:hidden) ─────────────────── */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-40 h-16 glass-header border-b border-[var(--color-border)] px-4 flex items-center justify-between">
@@ -220,8 +233,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* ── MAIN CONTENT ──────────────────────────────────────── */}
       <main
+        id="main-content"
         ref={mainContentRef}
-        className="flex-1 lg:ml-64 min-h-screen pt-20 pb-28 px-4 sm:px-6 lg:px-8 lg:pt-8 lg:pb-16 bg-[var(--color-bg)] transition-colors duration-300"
+        tabIndex={-1}
+        className="flex-1 lg:ml-64 min-h-screen pt-20 pb-28 px-4 sm:px-6 lg:px-8 lg:pt-8 lg:pb-16 bg-[var(--color-bg)] transition-colors duration-300 outline-none"
       >
         {children}
       </main>
@@ -268,6 +283,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Global AI Copilot */}
       <AICopilot />
+
+      {/* Global Scroll-To-Top Button */}
+      <ScrollToTop />
     </div>
   );
 }

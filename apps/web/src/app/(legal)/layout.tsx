@@ -11,6 +11,14 @@ export const metadata: Metadata = {
 export default function LegalLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#050505] text-[#e5e2e1]">
+      {/* Skip to content */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[10000] focus:px-4 focus:py-2 focus:rounded-xl focus:bg-[#dfff00] focus:text-[#050505] focus:font-mono focus:text-xs focus:font-bold focus:shadow-lg focus:outline-none"
+      >
+        Skip to main content
+      </a>
+
       {/* Top Navigation */}
       <header className="sticky top-0 z-50 border-b border-[#1a1a1a] bg-[#050505]/95 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -27,7 +35,7 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-6 py-12">
+      <main id="main-content" tabIndex={-1} className="max-w-4xl mx-auto px-6 py-12 outline-none">
         {children}
       </main>
 

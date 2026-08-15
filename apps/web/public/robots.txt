@@ -13,6 +13,10 @@ Allow: /app-store
 Allow: /mini-apps
 Allow: /moments
 Allow: /channels
+Allow: /contact
+Allow: /cookies
+Allow: /security
+Allow: /data-retention
 
 # Disallow Private User Data & Admin Endpoints
 Disallow: /chats
@@ -22,5 +26,6 @@ Disallow: /settings
 Disallow: /workspace
 Disallow: /notifications
 Disallow: /api/
+Disallow: /u/
 
-Sitemap: https://weeverything.vercel.app/sitemap.xml
+Sitemap: https://weeverything-web-chi.vercel.app/sitemap.xml

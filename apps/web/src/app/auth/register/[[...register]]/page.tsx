@@ -8,6 +8,7 @@ import { useAuthStore } from '@/store/auth.store';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { PasswordInput } from '@/components/ui/PasswordInput';
 import { Badge } from '@/components/ui/Badge';
 
 export default function RegisterPage() {
@@ -180,20 +181,24 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold uppercase font-mono text-[var(--color-text-muted)]">
-                Password
-              </label>
-              <Input
-                type="password"
+              <PasswordInput
+                id="register-password"
+                label="Password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
                 required
               />
             </div>
 
-            <Button type="submit" variant="secondary" size="lg" className="w-full mt-2" disabled={isLoading}>
-              {isLoading ? 'Creating Account...' : 'Register Account'}
+            <Button type="submit" variant="secondary" size="lg" className="w-full mt-2" disabled={isLoading} aria-busy={isLoading}>
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  Creating Account…
+                </span>
+              ) : 'Register Account'}
             </Button>
           </form>
         )}

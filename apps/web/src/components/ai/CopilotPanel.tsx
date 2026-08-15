@@ -44,24 +44,56 @@ export function CopilotPanel({ onClose }: { onClose: () => void }) {
     setIsStreaming(true);
 
     let accumulated = '';
+    let hasReceivedContent = false;
 
     const stop = streamCopilot(
       text,
       pathname,
       (delta) => {
+        hasReceivedContent = true;
         accumulated += delta;
         setMessages((prev) =>
           prev.map((m) => (m.id === assistantMsgId ? { ...m, content: accumulated } : m)),
         );
       },
       () => {
-        setMessages((prev) =>
-          prev.map((m) => (m.id === assistantMsgId ? { ...m, streaming: false } : m)),
-        );
+        // If no content was received, show a helpful fallback
+        if (!hasReceivedContent || !accumulated.trim()) {
+          const fallback =
+            "I can help with your tasks, wallet, messages, Mini Apps, and other WeEverything features. What would you like to do?";
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantMsgId
+                ? { ...m, content: fallback, streaming: false }
+                : m,
+            ),
+          );
+        } else {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === assistantMsgId ? { ...m, streaming: false } : m)),
+          );
+        }
         setIsStreaming(false);
         stopStreamRef.current = null;
       },
-      () => {
+      (err) => {
+        // Detect rate limit vs other errors
+        const isRateLimit =
+          err instanceof MessageEvent &&
+          typeof err.data === 'string' &&
+          err.data.toLowerCase().includes('rate');
+
+        const fallback = isRateLimit
+          ? "You're sending messages too quickly. Please wait a moment and try again."
+          : "I'm having trouble connecting right now. Please try again in a moment. If the issue persists, check your connection.";
+
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantMsgId
+              ? { ...m, content: fallback, streaming: false }
+              : m,
+          ),
+        );
         setIsStreaming(false);
         stopStreamRef.current = null;
       },

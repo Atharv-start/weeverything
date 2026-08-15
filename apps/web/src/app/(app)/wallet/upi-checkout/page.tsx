@@ -7,6 +7,7 @@ import { useAnimeStagger } from '@/lib/anime';
 import { api } from '@/lib/api';
 import { useAuthGuard } from '@/lib/useAuthGuard';
 import { AuthModal } from '@/components/ui/AuthModal';
+import { CopyButton } from '@/components/ui/CopyButton';
 
 type PaymentState = 'INIT' | 'INITIATED' | 'PENDING' | 'SUCCESS' | 'FAILED';
 
@@ -238,11 +239,17 @@ export default function UpiCheckoutPage() {
               <>
                 <div className="flex justify-between items-center text-[10px]">
                   <span className="text-[var(--color-text-muted)]">Provider Order ID:</span>
-                  <span className="text-[var(--color-text)] font-bold">{providerOrderId}</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[var(--color-text)] font-bold">{providerOrderId}</span>
+                    <CopyButton value={providerOrderId} label="Copy Order ID" size="sm" />
+                  </div>
                 </div>
                 <div className="flex justify-between items-center text-[10px]">
                   <span className="text-[var(--color-text-muted)]">Idempotency Key:</span>
-                  <span className="text-[var(--color-primary)]">{idempotencyKey}</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[var(--color-primary)]">{idempotencyKey}</span>
+                    <CopyButton value={idempotencyKey} label="Copy Key" size="sm" />
+                  </div>
                 </div>
 
                 {provider === 'SANDBOX' && paymentState === 'PENDING' && (

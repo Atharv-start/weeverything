@@ -13,6 +13,8 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
+import { PasswordInput } from '@/components/ui/PasswordInput';
+import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import {
   User,
   ShieldCheck,
@@ -75,6 +77,16 @@ export default function SettingsHubPage() {
   // Security Toggles
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
 
+  // Confirm logout dialog
+  const { confirm: confirmLogout, dialog: logoutDialog } = useConfirmDialog({
+    title: 'Sign Out of WeEverything?',
+    description: 'You will need to sign in again with your credentials to access your chats, wallet balance, and workspace notes.',
+    confirmLabel: 'Sign Out',
+    cancelLabel: 'Stay Signed In',
+    variant: 'danger',
+    confirmIcon: 'logout',
+  });
+
   // Connected Apps State
   const [connections, setConnections] = useState({
     gmail: true,
@@ -117,6 +129,8 @@ export default function SettingsHubPage() {
   };
 
   const handleLogout = async () => {
+    const confirmed = await confirmLogout();
+    if (!confirmed) return;
     await logout();
     router.push('/auth/login');
   };
@@ -486,12 +500,15 @@ export default function SettingsHubPage() {
               </div>
 
               <Button onClick={handleLogout} variant="danger" className="px-8 py-3 mx-auto">
-                Confirm & Sign Out
+                Sign Out
               </Button>
             </Card>
           )}
         </div>
       </div>
+
+      {/* Confirm Sign Out Dialog */}
+      {logoutDialog}
     </div>
   );
 }

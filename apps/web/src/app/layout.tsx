@@ -6,6 +6,8 @@ import { dark } from '@clerk/themes';
 import OfflineBanner from '@/components/OfflineBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
+const SITE_URL = 'https://weeverything-web-chi.vercel.app';
+
 export const metadata: Metadata = {
   title: {
     default: 'WeEverything — One App For Everything',
@@ -15,13 +17,22 @@ export const metadata: Metadata = {
     'WeEverything is a unified super-app platform for messaging, UPI payments, social moments, workspace collaboration, and mini-apps — all in one place.',
   keywords: ['super app', 'chat', 'social', 'UPI payments', 'wallet', 'productivity', 'mini apps', 'India', 'collaboration', 'workspace'],
   manifest: '/manifest.json',
-  metadataBase: new URL('https://weeverything.app'),
-  authors: [{ name: 'WeEverything Technologies', url: 'https://weeverything.app' }],
+  metadataBase: new URL(SITE_URL),
+  authors: [{ name: 'WeEverything Technologies', url: SITE_URL }],
   creator: 'WeEverything Technologies',
+  alternates: {
+    canonical: '/',
+  },
+  // Google Search Console verification — set NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION in Vercel env
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && {
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    },
+  }),
   openGraph: {
     title: 'WeEverything — One App For Everything',
     description: 'Messaging, UPI payments, social moments, workspace, and 15+ mini-apps in a single unified super-app.',
-    url: 'https://weeverything.app',
+    url: SITE_URL,
     siteName: 'WeEverything',
     type: 'website',
     locale: 'en_IN',
@@ -35,6 +46,13 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
@@ -66,6 +84,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="antialiased bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-300 font-body selection:bg-[var(--color-primary-dim)] selection:text-[var(--color-primary)]" suppressHydrationWarning>
+        {/* Global skip-to-content for auth/public pages */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[10000] focus:px-4 focus:py-2 focus:rounded-xl focus:bg-[var(--color-primary)] focus:text-[var(--color-text-inverse)] focus:font-mono focus:text-xs focus:font-bold focus:shadow-lg focus:outline-none"
+        >
+          Skip to main content
+        </a>
         {hasClerkKey ? (
           <ClerkProvider publishableKey={clerkKey} appearance={{ baseTheme: dark } as any}>
             {content}

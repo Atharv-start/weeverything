@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/auth.store';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAnimeStagger } from '@/lib/anime';
+import { CopyButton } from '@/components/ui/CopyButton';
 
 export default function UserProfilePage() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -147,7 +148,15 @@ export default function UserProfilePage() {
                   {displayProfile.profile?.level || 'Level 10 User'}
                 </span>
               </div>
-              <p className="font-mono text-xs text-[var(--color-text-muted)] mt-0.5">@{displayProfile.username}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="font-mono text-xs text-[var(--color-text-muted)] mt-0.5">@{displayProfile.username}</p>
+                <CopyButton
+                  value={`@${displayProfile.username}`}
+                  label="Copy username"
+                  tooltipPosition="right"
+                  size="sm"
+                />
+              </div>
             </div>
 
             <p className="font-body text-xs text-[var(--color-text-muted)] leading-relaxed max-w-2xl">
