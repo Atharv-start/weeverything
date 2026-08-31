@@ -28,7 +28,7 @@ const NAV_ITEMS = [
   { href: '/ai', icon: 'smart_toy', label: 'AI Hub' },
   { href: '/mini-apps', icon: 'apps', label: 'Mini Apps' },
   { href: '/app-store', icon: 'storefront', label: 'App Store' },
-  { href: '/search', icon: 'search', label: 'Search' },
+  { href: '/search', icon: 'search', label: 'Search', badge: '⌘K' },
   { href: '/notifications', icon: 'notifications', label: 'Notifications' },
   { href: '/settings', icon: 'settings', label: 'Settings' },
   { href: '/admin', icon: 'security', label: 'Admin', adminOnly: true },
@@ -53,6 +53,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       );
     }
   }, [pathname]);
+
+  // Global Ctrl+K / Cmd+K shortcut listener to quickly navigate to search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (pathname !== '/search') {
+          router.push('/search');
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [pathname, router]);
 
   const themeIcon = theme === 'dark' ? 'dark_mode' : theme === 'light' ? 'light_mode' : 'brightness_auto';
   const themeLabel = theme === 'dark' ? 'Dark' : theme === 'light' ? 'Light' : 'System';
