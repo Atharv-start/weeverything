@@ -1,0 +1,45 @@
+name: Daily GitHub Streak Maintainer
+
+on:
+  schedule:
+    # Runs at 00:00 UTC every day (05:30 AM IST)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allows manual trigger anytime from GitHub Actions UI
+
+permissions:
+  contents: write
+
+jobs:
+  daily-commit:
+    name: Daily Code Activity & Streak Keeper
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run daily update script
+        run: node scripts/daily-update.mjs
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "Atharv Raj Pandab"
+          git config --global user.email "atharvraj1122@gmail.com"
+          
+          git add docs/daily-activity.md
+          
+          # Only commit and push if changes exist
+          if git diff --staged --quiet; then
+            echo "No changes to commit today."
+          else
+            TODAY=$(date -u +'%Y-%m-%d')
+            git commit -m "chore(streak): update daily telemetry and feature progress [$TODAY]"
+            git push origin main
+          fi

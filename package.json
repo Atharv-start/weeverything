@@ -14,7 +14,8 @@
     "db:seed": "pnpm --filter @weeverything/database seed",
     "db:studio": "pnpm --filter @weeverything/database studio",
     "db:generate": "pnpm --filter @weeverything/database generate",
-    "db:reset": "pnpm --filter @weeverything/database migrate:reset"
+    "db:reset": "pnpm --filter @weeverything/database migrate:reset",
+    "streak": "node scripts/daily-update.mjs"
   },
   "devDependencies": {
     "turbo": "^2.3.3",
